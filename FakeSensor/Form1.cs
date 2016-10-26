@@ -8,12 +8,36 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PubNubMessaging.Core;
+using System.Threading;
 
 namespace FakeSensor
 {
     public partial class Form1 : Form
     {
         Pubnub pubnub;
+        Thread moveSensorThread;
+        Sensor[] sensorArray =
+            {
+                new Sensor{
+                    id = 0,
+                    lt = 49.4876274,
+                    lg = 0.5741083,
+                    gasrate = 8
+                  },
+                new Sensor{
+                    id = 1,
+                    lt = 49.4876274,
+                    lg = 0.5741083,
+                    gasrate = 8
+                  },
+                new Sensor{
+                    id = 2,
+                    lt = 49.4876274,
+                    lg = 0.5741083,
+                    gasrate = 8
+                  }
+            };
+
         public Form1()
         {
             InitializeComponent();
@@ -22,59 +46,15 @@ namespace FakeSensor
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //pubnub.Publish<string>(
-            //      "my_channel",
-            //      "Hello from the PubNub C# SDK!",
-            //      null,null
-            //);
-            Sensor[] sensorArray =
-            {
-                new Sensor{
-                    id = 11,
-                    lt = 49.4876274,
-                    lg = 0.5741083,
-                    gasrate = 8
-                  }
-            };
-
-            pubnub.Publish<string>(
-                       "Sensors",
-                       //new {id = 11, latlng = new double[]{ 49.4876274, 0.5741083}, gasrate = 8 },
-                       sensorArray,
-                       true,
-                       "test",
-                       DisplayReturnMessage,
-                       DisplayErrorMessage
-                 );
-
-            while (true)
-            {
-                Random r = new Random();
-                int iNum;
-                int result;
-
-                iNum = r.Next(-10, 11); //put whatever range you want in here from negative to positive 
-                if (iNum == 0) continue;
-                result = iNum / (int)Math.Abs(iNum);
-
-                foreach(var sensor in sensorArray)
-                {
-                    sensor.lt = sensor.lt + (result * 0.0002);
-                    sensor.lg = sensor.lg + (result * 0.0002);
-                }
-                pubnub.Publish<string>(
-                       "Sensors",
-                       //new {id = 11, latlng = new double[]{ 49.4876274, 0.5741083}, gasrate = 8 },
-                       sensorArray,
-                       true,
-                       "test",
-                       DisplayReturnMessage,
-                       DisplayErrorMessage
-                 );
-                System.Threading.Thread.Sleep(3000);
-            }
-
+            moveSensorThread = new Thread(moveSensor);
+            moveSensorThread.Start();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            moveSensorThread.Abort();
+        }
+
         void DisplayReturnMessage(string result)
         {
             Console.WriteLine("PUBLISH STATUS CALLBACK");
@@ -86,6 +66,46 @@ namespace FakeSensor
         void DisplayErrorMessage(PubnubClientError pubnubError)
         {
             Console.WriteLine(pubnubError.StatusCode);
+        }
+
+        void moveSensor()
+        {
+            pubnub.Publish<string>(
+                       "Sensors",
+                       sensorArray,
+                       true,
+                       "test",
+                       DisplayReturnMessage,
+                       DisplayErrorMessage
+                 );
+
+            while (true)
+            {
+                Random r = new Random();
+                
+                foreach (var sensor in sensorArray)
+                {
+                    var iNumlt = r.Next(-100, 101);
+                    var iNumlg = r.Next(-100, 101);
+                    var iNumGasrate = r.Next(-1, 2);
+                    sensor.lt = sensor.lt + (iNumlt * 0.00002);
+                    sensor.lg = sensor.lg + (iNumlg * 0.00002);
+                    sensor.gasrate = sensor.gasrate + iNumGasrate;
+
+                    //richTextBox1.Lines = richTextBox1.Lines.Concat(new[] {
+                    //    string.Format("{0} {1} {2} {3} {4}", sensor.id, sensor.lt, sensor.lg, sensor.gasrate) }).ToArray();
+                }
+                
+                pubnub.Publish<string>(
+                       "Sensors",
+                       sensorArray,
+                       true,
+                       "test",
+                       DisplayReturnMessage,
+                       DisplayErrorMessage
+                 );
+                Thread.Sleep(5000);
+            }
         }
     }
 }
