@@ -11,6 +11,6 @@ namespace FakeSensor
         public int id { get; set; }
         public double lt { get; set; }
         public double lg { get; set; }
-        public int gasrate { get; set; }
+        public Dictionary<string,int> gasArray { get; set; }
     }
 }

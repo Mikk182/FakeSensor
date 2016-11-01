@@ -22,19 +22,19 @@ namespace FakeSensor
                     id = 0,
                     lt = 49.4876274,
                     lg = 0.5741083,
-                    gasrate = 8
+                    //gasrate = 8
                   },
                 new Sensor{
                     id = 1,
                     lt = 49.4876274,
                     lg = 0.5741083,
-                    gasrate = 8
+                    //gasrate = 8
                   },
                 new Sensor{
                     id = 2,
                     lt = 49.4876274,
                     lg = 0.5741083,
-                    gasrate = 8
+                    //gasrate = 8
                   }
             };
 
@@ -90,7 +90,7 @@ namespace FakeSensor
                     var iNumGasrate = r.Next(-1, 2);
                     sensor.lt = sensor.lt + (iNumlt * 0.00002);
                     sensor.lg = sensor.lg + (iNumlg * 0.00002);
-                    sensor.gasrate = sensor.gasrate + iNumGasrate;
+                    //sensor.gasrate = sensor.gasrate + iNumGasrate;
 
                     //richTextBox1.Lines = richTextBox1.Lines.Concat(new[] {
                     //    string.Format("{0} {1} {2} {3} {4}", sensor.id, sensor.lt, sensor.lg, sensor.gasrate) }).ToArray();
